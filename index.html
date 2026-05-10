@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Limbic Loop Lab</title>
+  <style>
+    :root {
+      --bg: #f4f1ec;
+      --panel: #fffaf3;
+      --ink: #2d2926;
+      --muted: #6d625d;
+      --accent: #8f6f9f;
+      --accent-dark: #5f496d;
+      --soft-purple: #e8def0;
+      --soft-blue: #dfeaf2;
+      --soft-green: #dce9dc;
+      --soft-red: #efd9d5;
+      --soft-gold: #f5e4b8;
+      --soft-peach: #f2d7c4;
+      --radius: 22px;
+      --shadow: 0 12px 30px rgba(45, 41, 38, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      background: radial-gradient(circle at top left, #fff8ef, var(--bg));
+      color: var(--ink);
+      line-height: 1.5;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px 24px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      background: var(--soft-purple);
+      color: var(--accent-dark);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.3rem, 6vw, 4.4rem);
+      line-height: 1;
+    }
+
+    .subtitle {
+      max-width: 860px;
+      margin: 18px auto 0;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--muted);
+    }
+
+    .container {
+      width: min(1220px, calc(100% - 30px));
+      margin: 0 auto 42px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .card {
+      background: rgba(255, 250, 243, 0.96);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(143, 111, 159, 0.18);
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 1.65rem;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 1.12rem;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 14px 0 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      background: #eadfce;
+      color: var(--ink);
+      font-size: 0.95rem;
+      transition: all 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    button.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .loop-map {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .loop-step {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 12px;
+      align-items: center;
+      background: white;
+      border: 1px solid rgba(45, 41, 38, 0.12);
+      border-radius: 18px;
+      padding: 13px;
+    }
+
+    .step-label {
+      font-weight: bold;
+      color: var(--accent-dark);
+    }
+
+    .step-value {
+      min-height: 26px;
+    }
+
+    .arrow-down {
+      text-align: center;
+      color: var(--accent-dark);
+      font-size: 1.35rem;
+      font-weight: bold;
+    }
+
+    .output {
+      margin-top: 16px;
+      background: white;
+      border: 1px solid rgba(45, 41, 38, 0.12);
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 130px;
+    }
+
+    .quote-box {
+      margin-top: 16px;
+      background: var(--soft-gold);
+      border-radius: 18px;
+      padding: 16px;
+      font-weight: bold;
+    }
+
+    .vulnerability-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .check-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 1px solid rgba(45, 41, 38, 0.12);
+      border-radius: 16px;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .check-pill input { accent-color: var(--accent); }
+
+    .meter {
+      height: 26px;
+      border-radius: 999px;
+      background: #e7ddd2;
+      overflow: hidden;
+      margin-top: 18px;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 10%;
+      background: linear-gradient(90deg, #d8b6e8, #8f6f9f);
+      transition: width 0.25s ease;
+    }
+
+    .interrupt-card {
+      background: rgba(255,255,255,0.76);
+      border: 1px solid rgba(45, 41, 38, 0.12);
+      border-radius: 16px;
+      padding: 14px;
+      margin: 12px 0;
+    }
+
+    .interrupt-card h3 { margin-bottom: 6px; }
+
+    .pill {
+      display: inline-block;
+      background: var(--soft-blue);
+      color: var(--accent-dark);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 0.84rem;
+      font-weight: bold;
+      margin: 4px 4px 6px 0;
+    }
+
+    ul { margin: 8px 0 0; padding-left: 21px; }
+    li { margin: 6px 0; }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 28px;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .loop-step { grid-template-columns: 1fr; }
+      .vulnerability-list { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Interactive Recovery Neuroscience</div>
+    <h1>🔁 Limbic Loop Lab</h1>
+    <p class="subtitle">Explore how triggers become emotions, urges, behaviors, relief, reinforcement, and repeated patterns, and learn where recovery tools can interrupt the loop.</p>
+  </header>
+
+  <main class="container">
+    <section class="grid">
+      <div class="card">
+        <h2>🧩 Build Your Loop</h2>
+        <p class="hint">Choose one item from each section. The goal is not shame. The goal is pattern recognition.</p>
+
+        <h3>1. Trigger</h3>
+        <div class="button-row" id="triggerButtons"></div>
+
+        <h3>2. Emotional State</h3>
+        <div class="button-row" id="emotionButtons"></div>
+
+        <h3>3. Brain Response</h3>
+        <div class="button-row" id="brainButtons"></div>
+
+        <h3>4. Behavior</h3>
+        <div class="button-row" id="behaviorButtons"></div>
+      </div>
+
+      <div class="card">
+        <h2>🔁 Your Limbic Loop</h2>
+        <p class="hint">Watch how the pattern forms. This is a simplified map of how the nervous system can move faster than conscious choice.</p>
+
+        <div class="loop-map">
+          <div class="loop-step"><div class="step-label">Trigger</div><div class="step-value" id="loopTrigger">Choose a trigger</div></div>
+          <div class="arrow-down">↓</div>
+          <div class="loop-step"><div class="step-label">Emotion</div><div class="step-value" id="loopEmotion">Choose an emotional state</div></div>
+          <div class="arrow-down">↓</div>
+          <div class="loop-step"><div class="step-label">Brain Response</div><div class="step-value" id="loopBrain">Choose a brain response</div></div>
+          <div class="arrow-down">↓</div>
+          <div class="loop-step"><div class="step-label">Behavior</div><div class="step-value" id="loopBehavior">Choose a behavior</div></div>
+          <div class="arrow-down">↓</div>
+          <div class="loop-step"><div class="step-label">Short-Term Result</div><div class="step-value" id="loopShort">Temporary relief, escape, control, numbness, or discharge</div></div>
+          <div class="arrow-down">↓</div>
+          <div class="loop-step"><div class="step-label">Long-Term Result</div><div class="step-value" id="loopLong">The loop gets stronger unless something interrupts it</div></div>
+        </div>
+
+        <div class="quote-box" id="loopSummary">Awareness creates options. Choose items on the left to build a loop.</div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>⚠️ Vulnerability Meter</h2>
+        <p class="hint">Loops become stronger when the nervous system is already under-resourced. Check the factors that apply.</p>
+
+        <div class="vulnerability-list" id="vulnerabilityList"></div>
+
+        <div class="meter"><div class="meter-fill" id="vulnerabilityFill"></div></div>
+        <div class="output" id="vulnerabilityOutput">Select vulnerability factors to see how loop risk can increase.</div>
+      </div>
+
+      <div class="card">
+        <h2>🛑 Interrupt the Loop</h2>
+        <p class="hint">Choose tools that create space between signal and action. Tiny delays matter.</p>
+        <div class="button-row" id="interruptButtons"></div>
+        <div class="output" id="interruptOutput">Choose an interrupt tool to explore.</div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>🧠 What the Brain Is Learning</h2>
+        <div class="output">
+          <ul>
+            <li><strong>The limbic system learns by repetition.</strong> If a behavior repeatedly creates relief, the brain remembers it.</li>
+            <li><strong>Relief is powerful reinforcement.</strong> Even when the behavior causes harm later, short-term relief can strengthen the loop.</li>
+            <li><strong>Stress narrows options.</strong> Under high activation, the brain reaches for familiar patterns faster.</li>
+            <li><strong>Recovery creates new loops.</strong> Each pause, call, walk, breath, or honest choice gives the brain a new pathway to practice.</li>
+          </ul>
+        </div>
+        <div class="quote-box">You are not just stopping a behavior. You are teaching the brain a different route to safety.</div>
+      </div>
+
+      <div class="card">
+        <h2>💬 Group Discussion Prompts</h2>
+        <div class="output">
+          <ul>
+            <li>What part of your loop happens before you realize it?</li>
+            <li>Which vulnerability factor makes your loop stronger?</li>
+            <li>What short-term relief keeps a long-term pattern alive?</li>
+            <li>Where could you interrupt the loop earliest?</li>
+            <li>What recovery behavior could become your new automatic pattern?</li>
+            <li>How does it feel to view relapse or emotional reactions as patterns instead of personal failure?</li>
+          </ul>
+        </div>
+        <div class="quote-box">The goal is not perfect control. The goal is more awareness, more pause, and more options.</div>
+      </div>
+    </section>
+
+    <div class="footer">Educational tool only. This app is designed for psychoeducation, recovery insight, emotional regulation support, and group discussion.</div>
+  </main>
+
+  <script>
+    const state = {
+      trigger: '',
+      emotion: '',
+      brain: '',
+      behavior: ''
+    };
+
+    const options = {
+      trigger: ['Rejection', 'Boredom', 'Conflict', 'Loneliness', 'Shame', 'Uncertainty', 'Exhaustion', 'Being criticized', 'Feeling ignored', 'Trauma reminder'],
+      emotion: ['Anxious', 'Angry', 'Numb', 'Overwhelmed', 'Hopeless', 'Restless', 'Embarrassed', 'Unsafe', 'Empty', 'Trapped'],
+      brain: ['Threat mode', 'Craving', 'Shutdown', 'Urgency', 'Panic', 'Escape mode', 'People-pleasing', 'Control mode', 'Impulsive relief-seeking'],
+      behavior: ['Substance use', 'Isolation', 'Scrolling', 'Impulsive texting', 'Rage reaction', 'Avoidance', 'People-pleasing', 'Gambling/spending', 'Overworking', 'Shutting down']
+    };
+
+    const behaviorResults = {
+      'Substance use': ['Relief, numbness, escape, dopamine spike', 'Increased cravings, shame, withdrawal risk, stronger cue-behavior connection'],
+      'Isolation': ['Less stimulation, less immediate social risk', 'More loneliness, more rumination, fewer corrective experiences'],
+      'Scrolling': ['Distraction, novelty, temporary escape', 'More avoidance, comparison, sleep disruption, lower motivation'],
+      'Impulsive texting': ['Temporary contact, control, emotional discharge', 'Regret, conflict, anxiety, relationship strain'],
+      'Rage reaction': ['Power surge, release, feeling less helpless', 'Shame, disconnection, consequences, fear in relationships'],
+      'Avoidance': ['Temporary reduction in anxiety', 'More fear, less confidence, bigger future problems'],
+      'People-pleasing': ['Temporary approval, reduced conflict', 'Resentment, exhaustion, loss of self-trust'],
+      'Gambling/spending': ['Excitement, escape, reward anticipation', 'Financial stress, shame, secrecy, stronger risk-reward loop'],
+      'Overworking': ['Control, achievement, distraction', 'Burnout, resentment, body depletion, emotional avoidance'],
+      'Shutting down': ['Protection from overwhelm', 'Disconnection, unresolved needs, difficulty receiving support']
+    };
+
+    function makeButtons(items, containerId, key) {
+      const container = document.getElementById(containerId);
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.textContent = item;
+        btn.addEventListener('click', () => {
+          state[key] = item;
+          container.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderLoop();
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    makeButtons(options.trigger, 'triggerButtons', 'trigger');
+    makeButtons(options.emotion, 'emotionButtons', 'emotion');
+    makeButtons(options.brain, 'brainButtons', 'brain');
+    makeButtons(options.behavior, 'behaviorButtons', 'behavior');
+
+    function renderLoop() {
+      document.getElementById('loopTrigger').textContent = state.trigger || 'Choose a trigger';
+      document.getElementById('loopEmotion').textContent = state.emotion || 'Choose an emotional state';
+      document.getElementById('loopBrain').textContent = state.brain || 'Choose a brain response';
+      document.getElementById('loopBehavior').textContent = state.behavior || 'Choose a behavior';
+
+      if (state.behavior && behaviorResults[state.behavior]) {
+        document.getElementById('loopShort').textContent = behaviorResults[state.behavior][0];
+        document.getElementById('loopLong').textContent = behaviorResults[state.behavior][1];
+      }
+
+      const complete = state.trigger && state.emotion && state.brain && state.behavior;
+      document.getElementById('loopSummary').textContent = complete
+        ? `When ${state.trigger.toLowerCase()} activates ${state.emotion.toLowerCase()} feelings, the brain may enter ${state.brain.toLowerCase()} and reach for ${state.behavior.toLowerCase()}. This is a loop, not a life sentence.`
+        : 'Awareness creates options. Choose items on the left to build a loop.';
+    }
+
+    const vulnerabilityFactors = [
+      'Poor sleep', 'Hunger', 'Isolation', 'Conflict', 'Shame', 'Pain', 'Financial stress', 'Trauma reminder', 'Overstimulation', 'No routine', 'Withdrawal symptoms', 'Too much free time'
+    ];
+
+    const vulnerabilityList = document.getElementById('vulnerabilityList');
+    const vulnerabilityFill = document.getElementById('vulnerabilityFill');
+    const vulnerabilityOutput = document.getElementById('vulnerabilityOutput');
+
+    vulnerabilityFactors.forEach(factor => {
+      const label = document.createElement('label');
+      label.className = 'check-pill';
+      label.innerHTML = `<input type="checkbox" value="${factor}"> ${factor}`;
+      vulnerabilityList.appendChild(label);
+    });
+
+    vulnerabilityList.addEventListener('change', () => {
+      const checked = [...vulnerabilityList.querySelectorAll('input:checked')].map(input => input.value);
+      const score = Math.min(100, 10 + checked.length * 8);
+      vulnerabilityFill.style.width = score + '%';
+
+      if (checked.length === 0) {
+        vulnerabilityOutput.innerHTML = 'Select vulnerability factors to see how loop risk can increase.';
+      } else if (checked.length <= 3) {
+        vulnerabilityOutput.innerHTML = `<strong>Moderate vulnerability:</strong><br>${checked.join(', ')}<br><br>Your brain may need extra structure, grounding, and support today.`;
+      } else if (checked.length <= 7) {
+        vulnerabilityOutput.innerHTML = `<strong>High vulnerability:</strong><br>${checked.join(', ')}<br><br>This is a good time to reduce demands, increase support, and avoid relying on willpower alone.`;
+      } else {
+        vulnerabilityOutput.innerHTML = `<strong>Very high vulnerability:</strong><br>${checked.join(', ')}<br><br>The nervous system may be overloaded. Focus on basics first, safety, food, water, sleep, support, and medical/clinical help if needed.`;
+      }
+    });
+
+    const interruptTools = {
+      'Pause 30 seconds': {
+        dose: '30 seconds',
+        bestFor: 'Urgency, impulsive texting, rage reactions',
+        why: 'A short pause gives the prefrontal cortex a chance to rejoin the conversation before the behavior happens.',
+        tryThis: 'Say, I can feel the urge, and I can wait 30 seconds before obeying it.'
+      },
+      'Grounding': {
+        dose: '1 to 3 minutes',
+        bestFor: 'Panic, trauma reminders, emotional flooding',
+        why: 'Grounding helps the brain update its information from past danger to present safety.',
+        tryThis: 'Name 5 things you see, 4 things you feel, 3 things you hear, 2 things you smell, and 1 thing you taste.'
+      },
+      'Call or text support': {
+        dose: 'One honest message',
+        bestFor: 'Isolation, shame, cravings, hopelessness',
+        why: 'Connection can regulate the nervous system and interrupt secrecy, which often strengthens loops.',
+        tryThis: 'Send, I am in a loop right now and need a quick check-in.'
+      },
+      'Move your body': {
+        dose: '5 to 10 minutes',
+        bestFor: 'Restlessness, cravings, anger, anxiety',
+        why: 'Movement helps metabolize stress chemistry and gives the brain a different action pathway.',
+        tryThis: 'Walk, stretch, clean one surface, or do wall pushups for 2 minutes.'
+      },
+      'Urge surfing': {
+        dose: '5 minutes',
+        bestFor: 'Cravings, compulsive urges, emotional escape',
+        why: 'Urges rise, peak, and fall. Practicing riding the wave teaches the brain that urges are uncomfortable, not commands.',
+        tryThis: 'Rate the urge from 1 to 10, breathe, wait 2 minutes, and rate it again.'
+      },
+      'Change environment': {
+        dose: 'Immediate location shift',
+        bestFor: 'Cue-triggered cravings, conflict, rumination',
+        why: 'Changing sensory input can weaken the cue-behavior connection and create a reset point.',
+        tryThis: 'Step outside, move rooms, sit near staff/support, or leave the triggering area safely.'
+      },
+      'Name the loop': {
+        dose: '10 seconds',
+        bestFor: 'Automatic patterns, shame spirals, avoidance',
+        why: 'Naming moves the pattern from automatic survival mode into conscious awareness.',
+        tryThis: 'Say, This is my shame loop, not the whole truth.'
+      },
+      'Basic needs check': {
+        dose: '2 minutes',
+        bestFor: 'Irritability, brain fog, low motivation, cravings',
+        why: 'The brain becomes more reactive when basic needs are unmet. Sometimes the most clinical intervention is food, water, rest, or support.',
+        tryThis: 'Ask, Have I eaten, slept, hydrated, moved, or talked to someone safe?'
+      }
+    };
+
+    const interruptButtons = document.getElementById('interruptButtons');
+    const interruptOutput = document.getElementById('interruptOutput');
+
+    Object.keys(interruptTools).forEach(tool => {
+      const btn = document.createElement('button');
+      btn.textContent = tool;
+      btn.addEventListener('click', () => {
+        interruptButtons.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const data = interruptTools[tool];
+        interruptOutput.innerHTML = `
+          <div class="interrupt-card">
+            <h3>${tool}</h3>
+            <span class="pill">⏱️ ${data.dose}</span>
+            <span class="pill">🎯 ${data.bestFor}</span><br><br>
+            <strong>Why it helps:</strong> ${data.why}
+            <br><br><strong>Try this:</strong> ${data.tryThis}
+          </div>
+        `;
+      });
+      interruptButtons.appendChild(btn);
+    });
+  </script>
+</body>
+</html>
